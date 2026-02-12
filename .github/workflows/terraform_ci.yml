@@ -1,0 +1,38 @@
+name: Terraform Validation
+
+# Trigger the workflow on push to the main branch (or master)
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  terraform:
+    name: Terraform Format and Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the code to the runner
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Install Terraform on the runner
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0 # You can adjust this to your specific version
+
+      # 3. Initialize Terraform (required before validation)
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      # 4. Check Formatting (Task Requirement)
+      # The -check flag will fail the pipeline if files are not formatted correctly
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      # 5. Validate Syntax (Task Requirement)
+      - name: Terraform Validate
+        run: terraform validate
