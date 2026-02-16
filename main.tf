@@ -1,14 +1,10 @@
 data "aws_availability_zones" "available" {}
 
-
-
 data "aws_ami" "aws_linux2_x86" {
 
   most_recent = true
 
   owners = ["amazon"]
-
-
 
   filter {
 
@@ -17,8 +13,6 @@ data "aws_ami" "aws_linux2_x86" {
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
 
   }
-
-
 
   filter {
 
@@ -29,7 +23,6 @@ data "aws_ami" "aws_linux2_x86" {
   }
 
 
-
   filter {
 
     name = "virtualization-type"
@@ -37,8 +30,6 @@ data "aws_ami" "aws_linux2_x86" {
     values = ["hvm"]
 
   }
-
-
 
   filter {
 
@@ -49,8 +40,6 @@ data "aws_ami" "aws_linux2_x86" {
   }
 
 }
-
-
 
 resource "aws_vpc" "vpc" {
 
@@ -71,12 +60,9 @@ resource "aws_vpc" "vpc" {
 }
 
 
-
 resource "aws_internet_gateway" "igw" {
 
   vpc_id = aws_vpc.vpc.id
-
-
 
   tags = {
 
@@ -85,8 +71,6 @@ resource "aws_internet_gateway" "igw" {
   }
 
 }
-
-
 
 resource "aws_subnet" "subnet" {
 
@@ -100,8 +84,6 @@ resource "aws_subnet" "subnet" {
 
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
-
-
   tags = {
 
     Name = "tf-web-subnet-${count.index}"
@@ -110,13 +92,9 @@ resource "aws_subnet" "subnet" {
 
 }
 
-
-
 resource "aws_route_table" "rtb" {
 
   vpc_id = aws_vpc.vpc.id
-
-
 
   route {
 
@@ -126,8 +104,6 @@ resource "aws_route_table" "rtb" {
 
   }
 
-
-
   tags = {
 
     Name = "tf-web-public-rt"
@@ -135,8 +111,6 @@ resource "aws_route_table" "rtb" {
   }
 
 }
-
-
 
 resource "aws_route_table_association" "rta-subnet" {
 
@@ -148,8 +122,6 @@ resource "aws_route_table_association" "rta-subnet" {
 
 }
 
-
-
 resource "aws_security_group" "web_sg" {
 
   name = "web-sg-"
@@ -157,8 +129,6 @@ resource "aws_security_group" "web_sg" {
   description = "Allow SSH from your IP and HTTP from internet"
 
   vpc_id = aws_vpc.vpc.id
-
-
 
   ingress {
 
@@ -174,8 +144,6 @@ resource "aws_security_group" "web_sg" {
 
   }
 
-
-
   ingress {
 
     description = "HTTP from anywhere"
@@ -189,8 +157,6 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
 
   }
-
-
 
   egress {
 
@@ -206,8 +172,6 @@ resource "aws_security_group" "web_sg" {
 
   }
 
-
-
   tags = {
 
     Name = "web-sg"
@@ -215,8 +179,6 @@ resource "aws_security_group" "web_sg" {
   }
 
 }
-
-
 
 resource "aws_instance" "myinstance" {
 
@@ -232,8 +194,6 @@ resource "aws_instance" "myinstance" {
 
   key_name = var.key_name
 
-
-
   root_block_device {
 
     encrypted = true
@@ -241,7 +201,6 @@ resource "aws_instance" "myinstance" {
     volume_size = 8
 
   }
-
 
 
   user_data = <<-EOF
@@ -257,7 +216,6 @@ amazon-linux-extras enable nginx1
 yum install -y nginx
 
 systemctl enable nginx
-
 
 
 cat >/usr/share/nginx/html/index.html <<'EOPAGE'
@@ -302,8 +260,6 @@ systemctl start nginx
 
 EOF
 
-
-
   tags = {
 
     Name = "Terraform-${count.index + 1}"
@@ -315,7 +271,6 @@ EOF
   }
 
 }
-
 
 
 output "aws_host_ip" {
